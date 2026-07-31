@@ -18,7 +18,7 @@ import {
   WidthType,
   BorderStyle,
   HeadingLevel,
-  Media,
+  ImageRun,
 } from "docx";
 
 const CATEGORIES = [
