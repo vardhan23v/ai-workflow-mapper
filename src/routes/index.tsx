@@ -135,7 +135,8 @@ function Index() {
       "": 0,
     };
     items.forEach((i) => {
-      out[i.category || ""]++;
+      const key = i.category || "";
+      out[key] = (out[key] ?? 0) + 1;
     });
     return out;
   }, [items]);
