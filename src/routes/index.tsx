@@ -178,9 +178,9 @@ function Index() {
       right: { style: BorderStyle.SINGLE, size: 1, color: "AAAAAA" },
     };
 
-    const headerCell = (text: string) =>
+    const headerCell = (text: string, width: number) =>
       new TableCell({
-        width: { size: 0, type: WidthType.AUTO },
+        width: { size: width, type: WidthType.DXA },
         shading: { fill: "E5E7EB", type: "clear" as any },
         children: [
           new Paragraph({
@@ -190,9 +190,9 @@ function Index() {
         borders: border,
       });
 
-    const bodyCell = (text: string) =>
+    const bodyCell = (text: string, width: number) =>
       new TableCell({
-        width: { size: 0, type: WidthType.AUTO },
+        width: { size: width, type: WidthType.DXA },
         children: [new Paragraph({ children: [new TextRun({ text, size: 20 })] })],
         borders: border,
       });
@@ -223,28 +223,31 @@ function Index() {
       }),
     ];
 
+    const auditColWidths = [3600, 2200, 3560];
+
     const auditRows = items
       .filter((i) => i.name.trim())
       .map((i) => {
         const label = CATEGORIES.find((c) => c.id === i.category)?.label || i.category || "";
         return new TableRow({
           children: [
-            bodyCell(i.name),
-            bodyCell(label),
-            bodyCell(i.rationale),
+            bodyCell(i.name, auditColWidths[0]),
+            bodyCell(label, auditColWidths[1]),
+            bodyCell(i.rationale, auditColWidths[2]),
           ],
         });
       });
 
     children.push(
       new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
+        width: { size: 9360, type: WidthType.DXA },
+        columnWidths: auditColWidths,
         rows: [
           new TableRow({
             children: [
-              headerCell("Task"),
-              headerCell("Classification"),
-              headerCell("Rationale"),
+              headerCell("Task", auditColWidths[0]),
+              headerCell("Classification", auditColWidths[1]),
+              headerCell("Rationale", auditColWidths[2]),
             ],
           }),
           ...(auditRows.length
@@ -252,9 +255,9 @@ function Index() {
             : [
                 new TableRow({
                   children: [
-                    bodyCell("No tasks entered"),
-                    bodyCell("-"),
-                    bodyCell("-"),
+                    bodyCell("No tasks entered", auditColWidths[0]),
+                    bodyCell("-", auditColWidths[1]),
+                    bodyCell("-", auditColWidths[2]),
                   ],
                 }),
               ]),
@@ -269,21 +272,24 @@ function Index() {
       })
     );
 
+    const targetColWidths = [4200, 5160];
+
     const targetRows = targets.map((t) => {
       return new TableRow({
         children: [
-          bodyCell(t.name.trim() || "(not set)"),
-          bodyCell(t.successDefinition.trim() || "(not set)"),
+          bodyCell(t.name.trim() || "(not set)", targetColWidths[0]),
+          bodyCell(t.successDefinition.trim() || "(not set)", targetColWidths[1]),
         ],
       });
     });
 
     children.push(
       new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
+        width: { size: 9360, type: WidthType.DXA },
+        columnWidths: targetColWidths,
         rows: [
           new TableRow({
-            children: [headerCell("Target task"), headerCell('What "done well" means')],
+            children: [headerCell("Target task", targetColWidths[0]), headerCell('What "done well" means', targetColWidths[1])],
           }),
           ...targetRows,
         ],
@@ -293,7 +299,7 @@ function Index() {
     if (screenshot) {
       const arrayBuffer = await screenshot.arrayBuffer();
       const imageRun = new ImageRun({
-        data: Buffer.from(arrayBuffer),
+        data: new Uint8Array(arrayBuffer),
         transformation: { width: 450, height: 300 },
         type: screenshot.type.includes("png") ? "png" : "jpg",
       });
