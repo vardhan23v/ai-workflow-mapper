@@ -223,7 +223,7 @@ function Index() {
       }),
     ];
 
-    const auditColWidths = [3600, 2200, 3560];
+    const auditColWidths: [number, number, number] = [3600, 2200, 3560];
 
     const auditRows = items
       .filter((i) => i.name.trim())
