@@ -174,6 +174,33 @@ function Index() {
     }
   }
 
+  const linkValidation = useMemo(() => {
+    const rawLines = submissionLink.split(/\r?\n/);
+    const entries = rawLines
+      .map((raw, index) => ({ raw, index, value: raw.trim() }))
+      .filter((l) => l.value.length > 0);
+    const invalid = entries.filter((l) => !isValidUrl(l.value));
+    const seen = new Map<string, number>();
+    const duplicates: string[] = [];
+    entries.forEach((l) => {
+      const key = l.value.toLowerCase();
+      seen.set(key, (seen.get(key) ?? 0) + 1);
+      if (seen.get(key) === 2) duplicates.push(l.value);
+    });
+    const multiPerLine = entries.filter((l) => /\s/.test(l.value));
+    return {
+      urls: entries.map((l) => l.value),
+      invalid,
+      duplicates,
+      multiPerLine,
+      valid:
+        entries.length > 0 &&
+        invalid.length === 0 &&
+        duplicates.length === 0 &&
+        multiPerLine.length === 0,
+    };
+  }, [submissionLink]);
+
   const readiness = useMemo(() => {
     const filledTasks = items.filter((i) => i.name.trim());
     const validatedTasks = filledTasks.filter(
@@ -189,7 +216,7 @@ function Index() {
       (t) => t.name.trim() && t.successDefinition.trim()
     );
     const hasScreenshot = !!screenshot;
-    const hasLink = submissionMethod === "link" && isValidUrl(submissionLink.trim());
+    const hasLink = submissionMethod === "link" && linkValidation.valid;
     const fileReady = submissionMethod === "file" && fileDownloaded;
     const submissionReady = hasLink || fileReady;
     return {
@@ -210,7 +237,7 @@ function Index() {
         hasScreenshot &&
         submissionReady,
     };
-  }, [items, counts, checklist, targets, screenshot, submissionMethod, submissionLink, fileDownloaded]);
+  }, [items, counts, checklist, targets, screenshot, submissionMethod, linkValidation, fileDownloaded]);
 
   function triggerPrint() {
     if (typeof window !== "undefined") {
