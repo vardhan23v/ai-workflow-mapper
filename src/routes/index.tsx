@@ -633,6 +633,139 @@ function Index() {
         </section>
 
         <section className="mb-10 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="mb-4 text-lg font-semibold">Submission checklist</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Confirm every FL-01 requirement is met and whether you will submit a public link or an uploaded file.
+          </p>
+          <div className="space-y-3">
+            {[
+              {
+                ok: readiness.hasEnoughTasks,
+                label: `At least 10 tasks documented (${filledCount} filled)`,
+              },
+              {
+                ok: readiness.allFilledClassified,
+                label: "Every filled task has a classification and rationale",
+              },
+              {
+                ok: readiness.enoughJustMe,
+                label: `At least 2 tasks marked "Just me" (${counts["just-me"] ?? 0})`,
+              },
+              {
+                ok: readiness.targetsComplete,
+                label: "3 target tasks with success definitions",
+              },
+              {
+                ok: readiness.checklistComplete,
+                label: "Tool setup checklist complete",
+              },
+              {
+                ok: readiness.hasScreenshot,
+                label: "Claude Project screenshot uploaded",
+              },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-3">
+                <span
+                  className={
+                    item.ok ? "text-green-600" : "text-amber-600"
+                  }
+                >
+                  {item.ok ? "\u2713" : "\u0021"}
+                </span>
+                <span
+                  className={[
+                    "text-sm",
+                    item.ok
+                      ? "text-muted-foreground"
+                      : "text-foreground font-medium",
+                  ].join(" ")}
+                >
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 border-t border-border pt-4">
+            <p className="mb-3 text-sm font-medium">Submission method</p>
+            <div className="flex flex-wrap gap-3">
+              {[
+                { id: "link", label: "Public link" },
+                { id: "file", label: "File upload" },
+              ].map((opt) => {
+                const active = submissionMethod === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setSubmissionMethod(opt.id as "link" | "file")}
+                    className={[
+                      "rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-input bg-background text-foreground hover:bg-accent",
+                    ].join(" ")}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {submissionMethod === "link" && (
+              <div className="mt-3">
+                <input
+                  type="text"
+                  value={submissionLink}
+                  onChange={(e) => setSubmissionLink(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                {submissionLink.trim() && !readiness.hasLink && (
+                  <p className="mt-1.5 text-sm text-destructive">
+                    Enter a valid http(s) URL.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {submissionMethod === "file" && (
+              <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-accent">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 accent-primary"
+                  checked={fileDownloaded}
+                  onChange={(e) => setFileDownloaded(e.target.checked)}
+                />
+                <span className="text-sm">
+                  I have downloaded the DOCX and will upload it to the portal.
+                </span>
+              </label>
+            )}
+          </div>
+
+          <div
+            className={[
+              "mt-6 rounded-lg border p-4",
+              readiness.ready
+                ? "border-green-600/20 bg-green-600/10"
+                : "border-destructive/20 bg-destructive/10",
+            ].join(" ")}
+          >
+            <p
+              className={[
+                "text-sm font-medium",
+                readiness.ready ? "text-green-700" : "text-destructive",
+              ].join(" ")}
+            >
+              {readiness.ready
+                ? "\u2713 All set — you can submit now."
+                : "Complete the flagged items before submitting."}
+            </p>
+          </div>
+        </section>
+
+        <section className="mb-10 rounded-xl border border-border bg-card p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold">Export deliverable</h2>
           <div className="flex flex-wrap gap-3">
             <button
