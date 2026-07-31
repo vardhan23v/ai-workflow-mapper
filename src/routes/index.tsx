@@ -747,12 +747,15 @@ function Index() {
                     (one public http(s) URL per line)
                   </span>
                 </label>
+                <p className="mb-2 text-xs text-muted-foreground">
+                  The app URL ({"https://ai-audit-atlas.lovable.app"}) is not the deliverable. Paste a link to the hosted DOCX/PDF, or switch to File upload.
+                </p>
                 <textarea
                   value={submissionLink}
                   onChange={(e) => setSubmissionLink(e.target.value)}
                   rows={4}
                   spellCheck={false}
-                  placeholder={"https://ai-audit-atlas.lovable.app\nhttps://example.com/fl-01-audit.pdf"}
+                  placeholder={"https://example.com/fl-01-audit.pdf\nhttps://drive.google.com/file/d/.../view"}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
                 />
                 <div className="mt-1.5 space-y-1 text-sm">
