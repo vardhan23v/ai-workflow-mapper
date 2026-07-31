@@ -174,6 +174,33 @@ function Index() {
     }
   }
 
+  const linkValidation = useMemo(() => {
+    const rawLines = submissionLink.split(/\r?\n/);
+    const entries = rawLines
+      .map((raw, index) => ({ raw, index, value: raw.trim() }))
+      .filter((l) => l.value.length > 0);
+    const invalid = entries.filter((l) => !isValidUrl(l.value));
+    const seen = new Map<string, number>();
+    const duplicates: string[] = [];
+    entries.forEach((l) => {
+      const key = l.value.toLowerCase();
+      seen.set(key, (seen.get(key) ?? 0) + 1);
+      if (seen.get(key) === 2) duplicates.push(l.value);
+    });
+    const multiPerLine = entries.filter((l) => /\s/.test(l.value));
+    return {
+      urls: entries.map((l) => l.value),
+      invalid,
+      duplicates,
+      multiPerLine,
+      valid:
+        entries.length > 0 &&
+        invalid.length === 0 &&
+        duplicates.length === 0 &&
+        multiPerLine.length === 0,
+    };
+  }, [submissionLink]);
+
   const readiness = useMemo(() => {
     const filledTasks = items.filter((i) => i.name.trim());
     const validatedTasks = filledTasks.filter(
@@ -189,7 +216,7 @@ function Index() {
       (t) => t.name.trim() && t.successDefinition.trim()
     );
     const hasScreenshot = !!screenshot;
-    const hasLink = submissionMethod === "link" && isValidUrl(submissionLink.trim());
+    const hasLink = submissionMethod === "link" && linkValidation.valid;
     const fileReady = submissionMethod === "file" && fileDownloaded;
     const submissionReady = hasLink || fileReady;
     return {
@@ -210,7 +237,7 @@ function Index() {
         hasScreenshot &&
         submissionReady,
     };
-  }, [items, counts, checklist, targets, screenshot, submissionMethod, submissionLink, fileDownloaded]);
+  }, [items, counts, checklist, targets, screenshot, submissionMethod, linkValidation, fileDownloaded]);
 
   function triggerPrint() {
     if (typeof window !== "undefined") {
@@ -714,18 +741,48 @@ function Index() {
 
             {submissionMethod === "link" && (
               <div className="mt-3">
-                <input
-                  type="text"
+                <label className="mb-1.5 block text-sm font-medium">
+                  Deliverable links{" "}
+                  <span className="font-normal text-muted-foreground">
+                    (one public http(s) URL per line)
+                  </span>
+                </label>
+                <textarea
                   value={submissionLink}
                   onChange={(e) => setSubmissionLink(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                  rows={4}
+                  spellCheck={false}
+                  placeholder={"https://ai-audit-atlas.lovable.app\nhttps://example.com/fl-01-audit.pdf"}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
                 />
-                {submissionLink.trim() && !readiness.hasLink && (
-                  <p className="mt-1.5 text-sm text-destructive">
-                    Enter a valid http(s) URL.
-                  </p>
-                )}
+                <div className="mt-1.5 space-y-1 text-sm">
+                  {linkValidation.invalid.map((l) => (
+                    <p key={`inv-${l.index}`} className="text-destructive">
+                      Line {l.index + 1}: not a valid http(s) URL — “{l.value}”
+                    </p>
+                  ))}
+                  {linkValidation.multiPerLine.map((l) => (
+                    <p key={`multi-${l.index}`} className="text-destructive">
+                      Line {l.index + 1}: put only one URL per line (no spaces).
+                    </p>
+                  ))}
+                  {linkValidation.duplicates.map((d) => (
+                    <p key={`dup-${d}`} className="text-destructive">
+                      Duplicate link: {d}
+                    </p>
+                  ))}
+                  {linkValidation.valid && (
+                    <p className="text-green-700">
+                      {linkValidation.urls.length} valid link
+                      {linkValidation.urls.length === 1 ? "" : "s"} ready to paste.
+                    </p>
+                  )}
+                  {!submissionLink.trim() && (
+                    <p className="text-muted-foreground">
+                      Add at least one public link.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
