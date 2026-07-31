@@ -113,6 +113,9 @@ function Index() {
     null
   );
   const [notes, setNotes] = useState("");
+  const [submissionMethod, setSubmissionMethod] = useState<"link" | "file" | null>(null);
+  const [submissionLink, setSubmissionLink] = useState("");
+  const [fileDownloaded, setFileDownloaded] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
