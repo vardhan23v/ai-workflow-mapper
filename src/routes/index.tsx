@@ -199,7 +199,7 @@ function Index() {
 
     const completedChecklist = CHECKLIST.filter((c) => checklist[c.key]);
 
-    const children: Paragraph[] = [
+    const children: (Paragraph | Table)[] = [
       new Paragraph({
         heading: HeadingLevel.HEADING_1,
         alignment: AlignmentType.CENTER,
