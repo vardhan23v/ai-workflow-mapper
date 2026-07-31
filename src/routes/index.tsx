@@ -404,13 +404,13 @@ function Index() {
                 {justMeCount} just me
               </span>
               <span className="rounded-full bg-secondary px-2.5 py-1">
-                {counts.delegate} delegate
+                {counts["delegate"]} delegate
               </span>
               <span className="rounded-full bg-secondary px-2.5 py-1">
-                {counts.collaborate} collaborate
+                {counts["collaborate"]} collaborate
               </span>
               <span className="rounded-full bg-secondary px-2.5 py-1">
-                {counts.automate} automate
+                {counts["automate"]} automate
               </span>
             </div>
           </div>
