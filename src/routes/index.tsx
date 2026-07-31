@@ -741,18 +741,48 @@ function Index() {
 
             {submissionMethod === "link" && (
               <div className="mt-3">
-                <input
-                  type="text"
+                <label className="mb-1.5 block text-sm font-medium">
+                  Deliverable links{" "}
+                  <span className="font-normal text-muted-foreground">
+                    (one public http(s) URL per line)
+                  </span>
+                </label>
+                <textarea
                   value={submissionLink}
                   onChange={(e) => setSubmissionLink(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                  rows={4}
+                  spellCheck={false}
+                  placeholder={"https://ai-audit-atlas.lovable.app\nhttps://example.com/fl-01-audit.pdf"}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
                 />
-                {submissionLink.trim() && !readiness.hasLink && (
-                  <p className="mt-1.5 text-sm text-destructive">
-                    Enter a valid http(s) URL.
-                  </p>
-                )}
+                <div className="mt-1.5 space-y-1 text-sm">
+                  {linkValidation.invalid.map((l) => (
+                    <p key={`inv-${l.index}`} className="text-destructive">
+                      Line {l.index + 1}: not a valid http(s) URL — “{l.value}”
+                    </p>
+                  ))}
+                  {linkValidation.multiPerLine.map((l) => (
+                    <p key={`multi-${l.index}`} className="text-destructive">
+                      Line {l.index + 1}: put only one URL per line (no spaces).
+                    </p>
+                  ))}
+                  {linkValidation.duplicates.map((d) => (
+                    <p key={`dup-${d}`} className="text-destructive">
+                      Duplicate link: {d}
+                    </p>
+                  ))}
+                  {linkValidation.valid && (
+                    <p className="text-green-700">
+                      {linkValidation.urls.length} valid link
+                      {linkValidation.urls.length === 1 ? "" : "s"} ready to paste.
+                    </p>
+                  )}
+                  {!submissionLink.trim() && (
+                    <p className="text-muted-foreground">
+                      Add at least one public link.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
