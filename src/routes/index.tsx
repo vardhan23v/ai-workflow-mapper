@@ -292,17 +292,17 @@ function Index() {
 
     if (screenshot) {
       const arrayBuffer = await screenshot.arrayBuffer();
-      const image = Media.addImage({
+      const imageRun = new ImageRun({
         data: Buffer.from(arrayBuffer),
         transformation: { width: 450, height: 300 },
         type: screenshot.type.includes("png") ? "png" : "jpg",
-      } as any);
+      });
       children.push(
         new Paragraph({
           heading: HeadingLevel.HEADING_2,
           children: [new TextRun("Claude Project Screenshot")],
         }),
-        new Paragraph({ children: [image] })
+        new Paragraph({ children: [imageRun] })
       );
     }
 
