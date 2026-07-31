@@ -182,7 +182,7 @@ function Index() {
     const hasEnoughTasks = filledTasks.length >= 10;
     const allFilledClassified =
       filledTasks.length > 0 && filledTasks.length === validatedTasks.length;
-    const enoughJustMe = counts["just-me"] >= 2;
+    const enoughJustMe = (counts["just-me"] ?? 0) >= 2;
     const checklistComplete =
       CHECKLIST.filter((c) => checklist[c.key]).length === CHECKLIST.length;
     const targetsComplete = targets.every(
