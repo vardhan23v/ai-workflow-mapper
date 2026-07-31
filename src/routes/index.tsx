@@ -272,7 +272,7 @@ function Index() {
       })
     );
 
-    const targetColWidths = [4200, 5160];
+    const targetColWidths: [number, number] = [4200, 5160];
 
     const targetRows = targets.map((t) => {
       return new TableRow({
