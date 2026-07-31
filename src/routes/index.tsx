@@ -165,6 +165,53 @@ function Index() {
     setScreenshot(file);
   }
 
+  function isValidUrl(value: string) {
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }
+
+  const readiness = useMemo(() => {
+    const filledTasks = items.filter((i) => i.name.trim());
+    const validatedTasks = filledTasks.filter(
+      (i) => i.category && i.rationale.trim()
+    );
+    const hasEnoughTasks = filledTasks.length >= 10;
+    const allFilledClassified =
+      filledTasks.length > 0 && filledTasks.length === validatedTasks.length;
+    const enoughJustMe = counts["just-me"] >= 2;
+    const checklistComplete =
+      CHECKLIST.filter((c) => checklist[c.key]).length === CHECKLIST.length;
+    const targetsComplete = targets.every(
+      (t) => t.name.trim() && t.successDefinition.trim()
+    );
+    const hasScreenshot = !!screenshot;
+    const hasLink = submissionMethod === "link" && isValidUrl(submissionLink.trim());
+    const fileReady = submissionMethod === "file" && fileDownloaded;
+    const submissionReady = hasLink || fileReady;
+    return {
+      hasEnoughTasks,
+      allFilledClassified,
+      enoughJustMe,
+      checklistComplete,
+      targetsComplete,
+      hasScreenshot,
+      hasLink,
+      submissionReady,
+      ready:
+        hasEnoughTasks &&
+        allFilledClassified &&
+        enoughJustMe &&
+        checklistComplete &&
+        targetsComplete &&
+        hasScreenshot &&
+        submissionReady,
+    };
+  }, [items, counts, checklist, targets, screenshot, submissionMethod, submissionLink, fileDownloaded]);
+
   function triggerPrint() {
     if (typeof window !== "undefined") {
       window.print();
